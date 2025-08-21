@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>ARYENCRYPT</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+<style>
+body { background: black; color: #0f0; font-family: monospace; text-align:center; padding:50px;}
+input, button { margin:10px; padding:10px; border-radius:8px; border:2px solid #0f0; background:black; color:#0f0; cursor:pointer; }
+button:hover { background:#0f0; color:black; }
+p { margin-top:30px; }
+</style>
+</head>
+<body>
+<h1>⚡ ARYENCRYPT ⚡</h1>
+
+<input type="file" id="fileInput"><br>
+<input type="password" id="password" placeholder="Enter password"><br>
+<button onclick="encryptFile()">Encrypt & Download (.ary)</button>
+<button onclick="decryptFile()">Decrypt (.ary)</button>
+
+<p>Made by Aryan Giri❤️</p>
+
+<script>
+function arrayBufferToWordArray(ab) {
+  var u8 = new Uint8Array(ab);
+  var a = [], len = u8.length;
+  for(var i=0;i<len;i+=4){
+    a.push(
+      ((u8[i]<<24) | ((u8[i+1]||0)<<16) | ((u8[i+2]||0)<<8) | ((u8[i+3]||0))) >>> 0
+    );
+  }
+  return CryptoJS.lib.WordArray.create(a, len);
+}
+
+function wordArrayToUint8Array(wordArray) {
+  var len = wordArray.sigBytes;
+  var words = wordArray.words;
+  var u8 = new Uint8Array(len);
+  for(var i=0;i<len;i++){
+    u8[i] = (words[i>>>2] >>> (24 - (i%4)*8)) & 0xFF;
+  }
+  return u8;
+}
+
+function encryptFile() {
+  const file = document.getElementById("fileInput").files[0];
+  const password = document.getElementById("password").value;
+  if(!file || !password){ alert("Select a file and enter password!"); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const wordArray = arrayBufferToWordArray(e.target.result);
+    const encrypted = CryptoJS.AES.encrypt(wordArray, password).toString();
+    const blob = new Blob([encrypted], {type:"application/octet-stream"});
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = file.name + ".ary";
+    a.click();
+  }
+  reader.readAsArrayBuffer(file);
+}
+
+function decryptFile() {
+  const file = document.getElementById("fileInput").files[0];
+  const password = document.getElementById("password").value;
+  if(!file || !password){ alert("Select a file and enter password!"); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e){
+    try{
+      const encryptedData = e.target.result;
+      const decrypted = CryptoJS.AES.decrypt(encryptedData, password);
+      const u8 = wordArrayToUint8Array(decrypted);
+      const blob = new Blob([u8]);
+      const a = document.createElement("a");
+      const originalName = file.name.replace(/\.ary$/,"");
+      a.href = URL.createObjectURL(blob);
+      a.download = originalName || "decrypted_file";
+      a.click();
+      alert("File decrypted successfully!");
+    } catch(err){
+      alert("Error: Wrong password or corrupted file.");
+      console.error(err);
+    }
+  }
+  reader.readAsText(file);
+}
+</script>
+</body>
+</html>
