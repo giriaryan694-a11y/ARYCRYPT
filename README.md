@@ -19,8 +19,6 @@ A sleek, hacker-themed file encryption web app that lets you **encrypt any file*
 Check it out here:  
 [https://giriaryan694-a11y.github.io/ARYCRYPT/](https://giriaryan694-a11y.github.io/ARYCRYPT/)  
 
-*(Replace `yourusername` with your GitHub username)*
-
 ---
 
 ## 🛠 How to Use
@@ -41,3 +39,8 @@ If you want to host it yourself:
 git clone https://github.com/yourusername/aryencrypt.git
 cd aryencrypt
 # Open index.html in a browser or host on GitHub Pages
+```
+📜 License
+
+Made with ❤️ by Aryan
+Feel free to use, modify, and share responsibly.
